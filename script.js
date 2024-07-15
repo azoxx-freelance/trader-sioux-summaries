@@ -5,7 +5,7 @@ jqueryScript.onload = function() {
     $('table#table_summary, table#table_assets').remove();
 
     let spotAssetTransferred = {
-        'USDT': 3000,
+        'USDT': 670,
         'ETH': 0.3,
         'BTC': 0.07,
     };
@@ -178,7 +178,7 @@ jqueryScript.onload = function() {
         Object.entries(summary).forEach(([k, v]) => {
             let additionnalAsset = '';
             if(spotAssetTransferred[k] && spotAssetTransferred[k] !== undefined && spotAssetTransferred[k] > 0) {
-                additionnalAsset = `${roundNumber(spotAssetTransferred[k]-v[0], 2, k)} / ${spotAssetTransferred[k]}  ${k}`;
+                additionnalAsset = `${roundNumber(spotAssetTransferred[k]-v[0]+v[1], 2, k)} / ${spotAssetTransferred[k]}  ${k}`;
             }
             summaryHTML += `<tr><td>${k}</td>
                 <td>${roundNumber(v[1], 2, k)} ${k}</td>
