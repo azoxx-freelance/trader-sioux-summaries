@@ -32,6 +32,7 @@ Créer afin d'ajouter les éléments de statistique résumant les stats des bots
 7. Appuyez sur <kbd>Enter</kbd> afin d'executer le script
 
 Optionnel, si vous souhaitez exécuter le script à nouveau (après une actualisation ou autre)
+
 8. Toujours dans la Console de l'inspecteur, appuyer sur <kbd>Flèche Haut</kbd>
 9. Appuyez sur <kbd>Enter</kbd> afin d'executer le script à nouveau
 
