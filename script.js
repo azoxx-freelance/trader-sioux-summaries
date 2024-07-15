@@ -4,7 +4,12 @@ jqueryScript.setAttribute('src', 'https://code.jquery.com/jquery-3.6.0.min.js');
 jqueryScript.onload = function() {
     $('table#table_summary, table#table_assets').remove();
 
-    let spotUSDT = 670.00;
+    let spotAssetTransferred = {
+        'USDT': 3000,
+        'ETH': 0.3,
+        'BTC': 0.07,
+    };
+    
     let tableData = [];
     let summary = {}; // qty, pnl
     let assets = {};  // asset, qty, nbr, nbrTP, pnl
@@ -49,7 +54,7 @@ jqueryScript.onload = function() {
     Promise.all(promises)
         .then(results => {
             results.forEach(([botName, botId, followerAllocation]) => {
-                bots[botName][1] = followerAllocation;
+                bots[botName][1] = parseFloat(followerAllocation);
             });
             console.log(bots);
             getDatas();
@@ -142,15 +147,15 @@ jqueryScript.onload = function() {
         // Générer le HTML pour les actifs
         let assetsHTML = '<table id="table_assets" class="table table-striped" style="font-size:14px; margin-top:30px;"><thead><tr><th>Asset</th><th>Profit</th><th>Nbr TP</th><th>Position n°</th><th>Liquidité active / assignée</th><th>Qty Actif</th><th>Prix moyen</th><th>TP Cible</th></tr></thead><tbody>';
         Object.entries(assets).forEach(([k, v]) => {
-            if(bots[k] && bots[k][1] !== undefined){
+            if(bots[k] && bots[k][1] !== undefined && bots[k][1] > 0){
                 let [_a, _b] = k.split('-');
                 let avg_price = v[0] / v[1];
                 
                 if (!summary[_b]) {
-                    summary[_b] = [0, 0];
+                    summary[_b] = [0, 0, 0];
                 }
                 let pnl = v[3]+v[0];
-                summary[_b] = [summary[_b][0] + v[0], summary[_b][1] + pnl];
+                summary[_b] = [summary[_b][0] + v[0], summary[_b][1] + pnl, summary[_b][2] + bots[k][1] + v[0]];
                 
                 
                 assetsHTML += `<tr>
@@ -158,7 +163,7 @@ jqueryScript.onload = function() {
                     <td class="text-center">${roundNumber(pnl, 2, _b)} ${_b}</td>
                     <td class="text-center">${v[2]}</td>
                     <td class="text-center">${v[4]}/7</td>
-                    <td class="text-center">${roundNumber(v[0], 2, _b)} / ${roundNumber(parseFloat(bots[k][1])+v[0], 2, _b)} ${_b}</td>
+                    <td class="text-center">${roundNumber(v[0], 2, _b)} / ${roundNumber(bots[k][1]+v[0], 2, _b)} ${_b}</td>
                     <td class="text-center">${roundNumber(v[1], 6)} ${_a}</td>
                     <td class="text-center">${roundNumber(avg_price, 6, _b)} ${_b}</td>
                     <td class="text-center">~${roundNumber(avg_price*1.02, 6, _b)} ${_b}</td>
@@ -169,13 +174,17 @@ jqueryScript.onload = function() {
 
         
         // Générer le HTML pour le résumé
-        let summaryHTML = '<table id="table_summary" class="table table-striped" style="font-size:14px; margin-top:30px;"><thead><tr><th>Asset</th><th>Profits</th><th>Qty Actif</th></tr></thead><tbody>';
+        let summaryHTML = '<table id="table_summary" class="table table-striped" style="font-size:14px; margin-top:30px;"><thead><tr><th>Asset</th><th>Profits</th><th>Liquidité active / assignée</th><th>Liquidité restante / total</th></tr></thead><tbody>';
         Object.entries(summary).forEach(([k, v]) => {
-            let additionnalUSDT = '';
-            if(k === 'USDT') {
-                additionnalUSDT = `/ ${spotUSDT} ${k} | left: ${roundNumber(spotUSDT-v[0], 2, k)}`;
+            let additionnalAsset = '';
+            if(spotAssetTransferred[k] && spotAssetTransferred[k] !== undefined && spotAssetTransferred[k] > 0) {
+                additionnalAsset = `${roundNumber(spotAssetTransferred[k]-v[0], 2, k)} / ${spotAssetTransferred[k]}  ${k}`;
             }
-            summaryHTML += `<tr><td>${k}</td><td>${roundNumber(v[1], 2, k)} ${k}</td><td>${roundNumber(v[0], 2, k)} ${additionnalUSDT} ${k}</td></tr>`;
+            summaryHTML += `<tr><td>${k}</td>
+                <td>${roundNumber(v[1], 2, k)} ${k}</td>
+                <td>${roundNumber(v[0], 2, k)} / ${roundNumber(v[2], 2, k)}  ${k}</td>
+                <td>${additionnalAsset}</td>
+            </tr>`;
         });
         summaryHTML += '</tbody></table>';
         $('.container h1').append(summaryHTML);
