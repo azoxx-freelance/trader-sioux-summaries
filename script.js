@@ -4,7 +4,7 @@ jqueryScript.setAttribute('src', 'https://code.jquery.com/jquery-3.6.0.min.js');
 jqueryScript.onload = function() {
     $('table#table_summary, table#table_assets').remove();
 
-    let spotUSDT = 10000.00;
+    let spotUSDT = 670.00;
     let tableData = [];
     let summary = {}; // qty, pnl
     let assets = {};  // asset, qty, nbr, nbrTP, pnl
@@ -90,7 +90,6 @@ jqueryScript.onload = function() {
         tableDataReversed.forEach(function(t) {
             if(bots[t[2]] && bots[t[2]][1] !== undefined){
                 let actualBotIdAndPos = `${t[2]} #${t[3]}`;
-                let assetName = t[2].split("-")[1];
                 let qty = parseFloat(t[6].split(" ")[0]);
                 let pos = parseFloat(t[8].split(" ")[0]);
         
@@ -98,11 +97,6 @@ jqueryScript.onload = function() {
                     assets[t[2]] = [0, 0, 0, 0, 0];
                 }
                 let asset = assets[t[2]];
-        
-                if (!summary[assetName]) {
-                    summary[assetName] = [0, 0];
-                }
-                let sum = summary[assetName];
         
                 if (actualBotIdAndPos !== botIdAndPos) {
                     if (botIdAndPos !== '') 
@@ -113,7 +107,6 @@ jqueryScript.onload = function() {
         
                 if (t[5] === 'buy') {
                     trade = [actualBotIdAndPos, trade[1] + qty, trade[2] + pos, trade[3], trade[4]];
-                    sum[0] += pos;
                     asset[0] += pos;
                     asset[1] += qty;
                     asset[3] -= pos;
@@ -121,8 +114,6 @@ jqueryScript.onload = function() {
                 } else {
                     let pnl = pos - trade[2];
                     trade = [trade[0], qty, trade[2], pos, pnl];
-                    sum[0] -= pos;
-                    sum[1] += pnl;
                     asset[0] = 0;
                     asset[1] = 0;
                     asset[2] += 1;
@@ -133,13 +124,11 @@ jqueryScript.onload = function() {
                 //debug([pos, trade, asset[3]], t[2], 'BLAST-USDT');
         
                 assets[t[2]] = asset;
-                summary[assetName] = sum;
             }
         });
         
         trades.push(trade);
     
-        console.log(summary);
         console.log(assets);
         console.log(trades);
     }
@@ -149,6 +138,36 @@ jqueryScript.onload = function() {
 
 
     function showStats(){
+    
+        // Générer le HTML pour les actifs
+        let assetsHTML = '<table id="table_assets" class="table table-striped" style="font-size:14px; margin-top:30px;"><thead><tr><th>Asset</th><th>Profit</th><th>Nbr TP</th><th>Position n°</th><th>Liquidité active / assignée</th><th>Qty Actif</th><th>Prix moyen</th><th>TP Cible</th></tr></thead><tbody>';
+        Object.entries(assets).forEach(([k, v]) => {
+            if(bots[k] && bots[k][1] !== undefined){
+                let [_a, _b] = k.split('-');
+                let avg_price = v[0] / v[1];
+                
+                if (!summary[_b]) {
+                    summary[_b] = [0, 0];
+                }
+                let pnl = v[3]+v[0];
+                summary[_b] = [summary[_b][0] + v[0], summary[_b][1] + pnl];
+                
+                
+                assetsHTML += `<tr>
+                    <td class="text-center">${k}</td>
+                    <td class="text-center">${roundNumber(pnl, 2, _b)} ${_b}</td>
+                    <td class="text-center">${v[2]}</td>
+                    <td class="text-center">${v[4]}/7</td>
+                    <td class="text-center">${roundNumber(v[0], 2, _b)} / ${roundNumber(parseFloat(bots[k][1])+v[0], 2, _b)} ${_b}</td>
+                    <td class="text-center">${roundNumber(v[1], 6)} ${_a}</td>
+                    <td class="text-center">${roundNumber(avg_price, 6, _b)} ${_b}</td>
+                    <td class="text-center">~${roundNumber(avg_price*1.02, 6, _b)} ${_b}</td>
+                </tr>`;
+            }
+        });
+        assetsHTML += '</tbody></table>';
+
+        
         // Générer le HTML pour le résumé
         let summaryHTML = '<table id="table_summary" class="table table-striped" style="font-size:14px; margin-top:30px;"><thead><tr><th>Asset</th><th>Profits</th><th>Qty Actif</th></tr></thead><tbody>';
         Object.entries(summary).forEach(([k, v]) => {
@@ -160,26 +179,6 @@ jqueryScript.onload = function() {
         });
         summaryHTML += '</tbody></table>';
         $('.container h1').append(summaryHTML);
-    
-        // Générer le HTML pour les actifs
-        let assetsHTML = '<table id="table_assets" class="table table-striped" style="font-size:14px; margin-top:30px;"><thead><tr><th>Asset</th><th>Profit</th><th>Nbr TP</th><th>Position n°</th><th>Liquidité active / assignée</th><th>Qty Actif</th><th>Prix moyen</th><th>TP Cible</th></tr></thead><tbody>';
-        Object.entries(assets).forEach(([k, v]) => {
-            if(bots[k] && bots[k][1] !== undefined){
-                let [_a, _b] = k.split('-');
-                let avg_price = v[0] / v[1];
-                assetsHTML += `<tr>
-                    <td class="text-center">${k}</td>
-                    <td class="text-center">${roundNumber(v[3]+v[0], 2, _b)} ${_b}</td>
-                    <td class="text-center">${v[2]}</td>
-                    <td class="text-center">${v[4]}/7</td>
-                    <td class="text-center">${roundNumber(v[0], 2, _b)} / ${roundNumber(parseFloat(bots[k][1])+v[0], 2, _b)} ${_b}</td>
-                    <td class="text-center">${roundNumber(v[1], 6)} ${_a}</td>
-                    <td class="text-center">${roundNumber(avg_price, 6, _b)} ${_b}</td>
-                    <td class="text-center">~${roundNumber(avg_price*1.02, 6, _b)} ${_b}</td>
-                </tr>`;
-            }
-        });
-        assetsHTML += '</tbody></table>';
         $('.container h1').append(assetsHTML);
     }
 
