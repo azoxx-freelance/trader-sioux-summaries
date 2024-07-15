@@ -4,7 +4,7 @@ jqueryScript.setAttribute('src', 'https://code.jquery.com/jquery-3.6.0.min.js');
 jqueryScript.onload = function() {
     $('table#table_summary, table#table_assets').remove();
 
-    let spotUSDT = 670.00;
+    let spotUSDT = 10000.00;
     let tableData = [];
     let summary = {}; // qty, pnl
     let assets = {};  // asset, qty, nbr, nbrTP, pnl
