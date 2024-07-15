@@ -29,6 +29,12 @@ Créer afin d'ajouter les éléments de statistique résumant les stats des bots
 4. Vous allez voir des menus 'Element, Console, Sources, ...', cliquez sur 'Console'
 5. Copier le contenu de <a href="https://github.com/azoxx-freelance/trader-sioux-summaries/blob/master/script.js">script.js</a>
 6. Collez le code dans la console que vous avez ouverte précédament
+7. Appuyez sur <kbd>Enter</kbd> afin d'executer le script
+
+Optionnel, si vous souhaitez exécuter le script à nouveau (après une actualisation ou autre)
+8. Toujours dans la Console de l'inspecteur, appuyer sur <kbd>Flèche Haut</kbd>
+9. Appuyez sur <kbd>Enter</kbd> afin d'executer le script à nouveau
+
 
 Tips: Vous pouvez modifier de la ligne 7 à 11 en assigant les valeurs que vous avez transféré sur votre compte spot : 
 ```
