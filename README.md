@@ -30,7 +30,14 @@ Créer afin d'ajouter les éléments de statistique résumant les stats des bots
 5. Copier le contenu de <a href="https://github.com/azoxx-freelance/trader-sioux-summaries/blob/master/script.js">script.js</a>
 6. Collez le code dans la console que vous avez ouverte précédament
 
-Tips: Vous pouvez modifier la ligne 7 avec la valeur que vous avez transférer sur votre compte spot (de base c'est 10k$) : `let spotUSDT = 10000.00;`
+Tips: Vous pouvez modifier de la ligne 7 à 11 en assigant les valeurs que vous avez transféré sur votre compte spot : 
+```
+    let spotAssetTransferred = {
+        'USDT': 3000,
+        'ETH': 0.3,
+        'BTC': 0.07,
+    };
+```
 
 
 ## Result
