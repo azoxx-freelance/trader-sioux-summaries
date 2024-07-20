@@ -72,8 +72,8 @@ jqueryScript.onload = function() {
             
             let useElement = row.querySelector('use');
             if (useElement) {
-                if(useElement.getAttribute("xlink:href") === "#check-circle") {
-                    let cells = row.querySelectorAll('td');
+                let cells = row.querySelectorAll('td');
+                if(useElement.getAttribute("xlink:href") === "#check-circle" || cells[4].innerText == "sell") {
                     let asset = `${cells[5].innerText.split(" ")[1]}-${cells[6].innerText.split(" ")[1]}`;
                     cells[1].innerText = asset;
             
@@ -160,9 +160,9 @@ jqueryScript.onload = function() {
                 
                 assetsHTML += `<tr>
                     <td class="text-center">${k}</td>
-                    <td class="text-center">${roundNumber(pnl, 2, _b)} ${_b}</td>
+                    <td class="text-center">${roundNumber(pnl, 2, _b)} ${_b} (${roundNumber(100*pnl/(bots[k][1]+v[0]), 2)}%)</td>
                     <td class="text-center">${v[2]}</td>
-                    <td class="text-center">${v[4]}/7</td>
+                    <td class="text-center">${v[4]}/8</td>
                     <td class="text-center">${roundNumber(v[0], 2, _b)} / ${roundNumber(bots[k][1]+v[0], 2, _b)} ${_b}</td>
                     <td class="text-center">${roundNumber(v[1], 6)} ${_a}</td>
                     <td class="text-center">${roundNumber(avg_price, 6, _b)} ${_b}</td>
@@ -181,7 +181,7 @@ jqueryScript.onload = function() {
                 additionnalAsset = `${roundNumber(spotAssetTransferred[k]-v[0]+v[1], 2, k)} / ${spotAssetTransferred[k]}  ${k}`;
             }
             summaryHTML += `<tr><td>${k}</td>
-                <td>${roundNumber(v[1], 2, k)} ${k}</td>
+                <td>${roundNumber(v[1], 2, k)} ${k} (${roundNumber(100*v[1]/v[2], 2)}%)</td>
                 <td>${roundNumber(v[0], 2, k)} / ${roundNumber(v[2], 2, k)}  ${k}</td>
                 <td>${additionnalAsset}</td>
             </tr>`;
