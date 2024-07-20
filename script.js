@@ -74,6 +74,11 @@ jqueryScript.onload = function() {
             if (useElement) {
                 let cells = row.querySelectorAll('td');
                 if(useElement.getAttribute("xlink:href") === "#check-circle" || cells[4].innerText == "sell") {
+                    if(cells[4].innerText == "sell") {
+                        $(cells[4]).css("color", "red");
+                    } else {
+                        $(cells[4]).css("color", "green");
+                    }
                     let asset = `${cells[5].innerText.split(" ")[1]}-${cells[6].innerText.split(" ")[1]}`;
                     cells[1].innerText = asset;
             
@@ -145,7 +150,7 @@ jqueryScript.onload = function() {
     function showStats(){
     
         // Générer le HTML pour les actifs
-        let assetsHTML = '<table id="table_assets" class="table table-striped" style="font-size:14px; margin-top:30px;"><thead><tr><th>Asset</th><th>Profit</th><th>Nbr TP</th><th>Position n°</th><th>Liquidité active / assignée</th><th>Qty Actif</th><th>Prix moyen</th><th>TP Cible</th></tr></thead><tbody>';
+        let assetsHTML = '<table id="table_assets" class="table table-striped" style="font-size:13px; margin-top:30px;"><thead><tr><th>Asset</th><th>Profit</th><th>Nbr TP</th><th>Position n°</th><th>Liquidité active / assignée</th><th>Qty Actif</th><th>Prix moyen</th><th>TP Cible</th></tr></thead><tbody>';
         Object.entries(assets).forEach(([k, v]) => {
             if(bots[k] && bots[k][1] !== undefined && bots[k][1] > 0){
                 let [_a, _b] = k.split('-');
@@ -160,13 +165,13 @@ jqueryScript.onload = function() {
                 
                 assetsHTML += `<tr>
                     <td class="text-center">${k}</td>
-                    <td class="text-center">${roundNumber(pnl, 2, _b)} ${_b} (${roundNumber(100*pnl/(bots[k][1]+v[0]), 2)}%)</td>
-                    <td class="text-center">${v[2]}</td>
-                    <td class="text-center">${v[4]}/8</td>
+                    <td class="text-center">${((pnl == 0)?'':roundNumber(pnl, 2, _b) + ' ' + _b + ' (' +  roundNumber(100*pnl/(bots[k][1]+v[0]), 2) + '%)')}</td>
+                    <td class="text-center">${(v[2]==0)?'':v[2]}</td>
+                    <td class="text-center">${((v[4]==0)?'':v[4]+'/8')}</td>
                     <td class="text-center">${roundNumber(v[0], 2, _b)} / ${roundNumber(bots[k][1]+v[0], 2, _b)} ${_b}</td>
-                    <td class="text-center">${roundNumber(v[1], 6)} ${_a}</td>
-                    <td class="text-center">${roundNumber(avg_price, 6, _b)} ${_b}</td>
-                    <td class="text-center">~${roundNumber(avg_price*1.02, 6, _b)} ${_b}</td>
+                    <td class="text-center">${((v[1] == 0)?'':roundNumber(v[1], 6) + ' ' + _a)}</td>
+                    <td class="text-center">${((v[1] == 0)?'':roundNumber(avg_price, 6, _b) + ' ' + _b)}</td>
+                    <td class="text-center">${((v[1] == 0)?'':'~'+roundNumber(avg_price*1.02, 6, _b) + ' ' + _b)}</td>
                 </tr>`;
             }
         });
