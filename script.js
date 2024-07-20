@@ -11,8 +11,11 @@ jqueryScript.onload = function() {
     };
     
     let tableData = [];
+    let chartData = {};
+    let cumulativePos = {};
     let summary = {}; // qty, pnl
     let assets = {};  // asset, qty, nbr, nbrTP, pnl
+    let assetActive = {};
     let trades = [];
     let bots = {
         'BTC-USDT': [28, 0],
@@ -60,6 +63,7 @@ jqueryScript.onload = function() {
             getDatas();
             processDatas();
             showStats();
+            showChart();
         })
         .catch(error => {
             console.error("Erreur lors de la récupération des données:", error);
@@ -96,15 +100,24 @@ jqueryScript.onload = function() {
         let tableDataReversed = tableData.reverse();
         let trade = ['', 0, 0, 0, 0]; // [actualBotIdAndPos, qty, priceBuy, priceSell, pnl];
         let botIdAndPos = '';
+        chartData['USDT'] = [];
+        cumulativePos['USDT'] = 0;
     
         tableDataReversed.forEach(function(t) {
+            let actualBotIdAndPos = `${t[2]} #${t[3]}`;
+            let qty = parseFloat(t[6].split(" ")[0]);
+            let pos = parseFloat(t[8].split(" ")[0]);
+            /*if(t[8].split(" ")[1] === 'USDT' && t[2] == 'AR-USDT'){
+                cumulativePos += (t[5]==='buy')?(0-pos):pos;
+                chartData.push({x:convertToDateObject(t[1]), y:cumulativePos});
+            }*/
+            
             if(bots[t[2]] && bots[t[2]][1] !== undefined){
-                let actualBotIdAndPos = `${t[2]} #${t[3]}`;
-                let qty = parseFloat(t[6].split(" ")[0]);
-                let pos = parseFloat(t[8].split(" ")[0]);
-        
                 if (!assets[t[2]]) {
                     assets[t[2]] = [0, 0, 0, 0, 0];
+                }
+                if (!assetActive[t[2]]) {
+                    assetActive[t[2]] = 0;
                 }
                 let asset = assets[t[2]];
         
@@ -114,23 +127,37 @@ jqueryScript.onload = function() {
                     trade = [actualBotIdAndPos, 0, 0, 0, 0];
                     botIdAndPos = actualBotIdAndPos;
                 }
-        
+
+                let pnl = 0;
                 if (t[5] === 'buy') {
                     trade = [actualBotIdAndPos, trade[1] + qty, trade[2] + pos, trade[3], trade[4]];
                     asset[0] += pos;
                     asset[1] += qty;
                     asset[3] -= pos;
                     asset[4]++;
+                    assetActive[t[2]] += pos;
                 } else {
-                    let pnl = pos - trade[2];
+                    pnl = pos - assetActive[t[2]];
                     trade = [trade[0], qty, trade[2], pos, pnl];
                     asset[0] = 0;
                     asset[1] = 0;
                     asset[2] += 1;
                     asset[3] += pos;
                     asset[4] = 0;
+                    assetActive[t[2]] = 0;
                 }
                 
+                if (!chartData[t[2]]) {
+                    chartData[t[2]] = [];
+                    cumulativePos[t[2]] = 0;
+                }
+                cumulativePos[t[2]] += pnl;
+                chartData[t[2]].push({x:convertToDateObject(t[1]), y:cumulativePos[t[2]]});
+                
+                if(t[8].split(" ")[1] === 'USDT'){
+                    cumulativePos['USDT'] += pnl;
+                    chartData['USDT'].push({x:convertToDateObject(t[1]), y:cumulativePos['USDT']});
+                }
                 //debug([pos, trade, asset[3]], t[2], 'BLAST-USDT');
         
                 assets[t[2]] = asset;
@@ -139,7 +166,7 @@ jqueryScript.onload = function() {
         
         trades.push(trade);
     
-        console.log(assets);
+        //console.log(assets);
         console.log(trades);
     }
 
@@ -196,6 +223,111 @@ jqueryScript.onload = function() {
         $('.container h1').append(assetsHTML);
     }
 
+
+    
+
+    function showChart() {
+        $('p#botsChartText').remove();
+        $('canvas#botsChart').remove();
+        $('canvas#profitChart').remove();
+        $('.container h1').append('<p id="botsChartText" style="font-size: 12px; margin:0;">Cliquez sur la légende pour filtrer les paires :</p><canvas id="profitChart" style="width:100%;"></canvas>');
+        console.log(chartData);
+    
+        
+        var chartScript = document.createElement('script');
+        chartScript.setAttribute('src', 'https://cdn.jsdelivr.net/npm/chart.js');
+        chartScript.onload = function() {
+            var chartTimeScript = document.createElement('script');
+            chartTimeScript.setAttribute('src', 'https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns');
+            chartTimeScript.onload = function() {
+
+                /*
+                let datasets = [];
+                Object.entries(chartData).forEach(([k, v]) => {
+                    datasets.push({label: k, data: v, fill: false, borderColor: getRandomColor(), tension: 0.1});
+                });
+                
+                let chart = new Chart('botsChart', {
+                    type: 'line',
+                    data: {datasets: datasets},
+                    options: {
+                        scales: {
+                            x: {
+                                type: 'time',
+                                time: {
+                                    unit: 'day',
+                                    tooltipFormat: 'dd/MM/yyyy HH:mm:ss',
+                                    displayFormats: {day: 'dd/MM/yyyy'}
+                                },
+                                title: {display: true, text: 'Date'}
+                            },
+                            y: {
+                                beginAtZero: true,
+                                title: {display: true, text: 'Value'}
+                            }
+                        }
+                    }
+                });*/
+
+
+
+                var chartFinanceScript = document.createElement('script');
+                chartFinanceScript.setAttribute('src', 'https://cdn.jsdelivr.net/npm/chartjs-chart-financial');
+                chartFinanceScript.onload = function() {
+
+                    
+                    let financialData = convertToDailyFinancialData(chartData['USDT']);
+
+                    
+                    let datasets = [];
+                    datasets.push({
+                        label: 'USDT - Bar Chart',
+                        data: financialData
+                    });
+                    
+                    Object.entries(chartData).forEach(([k, v]) => {
+                        datasets.push({
+                            type: 'line',
+                            label: k, 
+                            data: v, 
+                            fill: false, 
+                            borderColor: getRandomColor(), 
+                            hidden: true,
+                        });
+                    });
+        
+                    let chart = new Chart('profitChart', {
+                        type: 'candlestick',
+                        data: {
+                            datasets: datasets
+                        },
+                        options: {
+                            scales: {
+                                x: {
+                                    type: 'time',
+                                    time: {
+                                        unit: 'day',
+                                        tooltipFormat: 'dd/MM/yyyy HH:mm:ss',
+                                        displayFormats: {day: 'dd/MM/yyyy'}
+                                    },
+                                    title: {display: true, text: 'Date'}
+                                },
+                                y: {
+                                    beginAtZero: true,
+                                    title: {display: true, text: 'Value'}
+                                }
+                            }
+                        }
+                    });
+                
+                };
+                document.head.appendChild(chartFinanceScript);
+            };
+            document.head.appendChild(chartTimeScript);
+        };
+        document.head.appendChild(chartScript);
+    }
+
     
 };
 document.head.appendChild(jqueryScript);
@@ -208,4 +340,67 @@ function debug(text, needle = null, asset = null){
     if(needle === asset){
         console.log(text);
     }
+}
+
+
+function convertToDateObject(dateStr) {
+    const [date, time] = dateStr.split(' ');
+    const [day, month, year] = date.split('/');
+    return new Date(`${year}-${month}-${day}T${time}`);
+}
+
+
+function getRandomColor() {
+    const r = Math.floor(Math.random() * 255);
+    const g = Math.floor(Math.random() * 255);
+    const b = Math.floor(Math.random() * 255);
+    return `rgba(${r}, ${g}, ${b}, 1)`;
+}
+
+function convertToDailyFinancialData(data) {
+    let groupedData = {};
+    
+    // Grouper les données par jour
+    data.forEach(point => {
+        let date = new Date(point.x);
+        let dayKey = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+        
+        if (!groupedData[dayKey]) {
+            groupedData[dayKey] = [];
+        }
+        groupedData[dayKey].push(point.y);
+    });
+    
+    // Créer un tableau de dates complètes
+    let startDate = new Date(Math.min(...data.map(point => new Date(point.x))));
+    let endDate = new Date(Math.max(...data.map(point => new Date(point.x))));
+    let currentDate = new Date(startDate);
+    let allDates = [];
+
+    endDate.setDate(endDate.getDate() + 1);
+    while (currentDate <= endDate) {
+        allDates.push(new Date(currentDate));
+        currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    let financialData = [];
+    let lastClose = 0;
+    for (let i = 0; i < allDates.length; i++) {
+        let dayKey = `${allDates[i].getFullYear()}-${allDates[i].getMonth() + 1}-${allDates[i].getDate()}`;
+        let yValues = groupedData[dayKey] || [];
+        
+        financialData.push({
+            x: allDates[i].getTime(),
+            o: lastClose,
+            h: yValues.length ? roundNumber(Math.max(...yValues)) : lastClose,
+            l: lastClose,
+            c: yValues.length ? roundNumber(yValues[yValues.length - 1]) : lastClose
+        });
+
+        lastClose = yValues.length ? roundNumber(yValues[yValues.length - 1]) : lastClose;
+    }
+
+    console.log(financialData);
+
+    return financialData;
 }
