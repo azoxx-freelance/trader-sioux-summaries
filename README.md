@@ -25,7 +25,7 @@ Créer afin d'ajouter les éléments de statistique résumant les stats des bots
 
 1. Connectez vous à votre compte <a href="https://www.tradersioux.fr/">trader-sioux</a>
 2. Allez sur la page <a href="[https://www.tradersioux.fr/](https://www.tradersioux.fr/mytrades)">Trade</a>
-3. Ouvrez votre inspecteur via F12
+3. Ouvrez votre inspecteur via <kbd>F12</kbd> de votre clavier
 4. Vous allez voir des menus 'Element, Console, Sources, ...', cliquez sur 'Console'
 5. Copier le contenu de <a href="https://github.com/azoxx-freelance/trader-sioux-summaries/blob/master/script.js">script.js</a>
 6. Collez le code dans la console que vous avez ouverte précédament
