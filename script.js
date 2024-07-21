@@ -116,7 +116,7 @@ jqueryScript.onload = function() {
                 chartData.push({x:convertToDateObject(t[1]), y:cumulativePos});
             }*/
             
-            if(bots[t[2]] && bots[t[2]][1] !== undefined){
+            if(bots[t[2]] && bots[t[2]][1] !== undefined && t[4] === 'bitget (spot)'){
                 if (!assets[t[2]]) {
                     assets[t[2]] = [0, 0, 0, 0, 0];
                 }
