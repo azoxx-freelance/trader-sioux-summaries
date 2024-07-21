@@ -301,6 +301,7 @@ jqueryScript.onload = function() {
 
                     
                     let financialData = convertToDailyFinancialData(chartData['USDT']);
+                    console.log(financialData[financialData.lenght - 1])
 
                     
                     let datasets = [];
@@ -329,6 +330,8 @@ jqueryScript.onload = function() {
                             scales: {
                                 x: {
                                     type: 'time',
+                                    min: financialData[0].x,
+                                    max: financialData[financialData.length-1].x,
                                     time: {
                                         unit: 'day',
                                         tooltipFormat: 'dd/MM/yyyy',
