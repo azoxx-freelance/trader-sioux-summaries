@@ -31,10 +31,13 @@ Créer afin d'ajouter les éléments de statistique résumant les stats des bots
 6. Collez le code dans la console que vous avez ouverte précédament
 7. Appuyez sur <kbd>Enter</kbd> afin d'executer le script
 
+/!\ Si vous avez une erreur type CSP (Content Security Policy) lors de l'execution, utilisez plutot : <a href="https://github.com/azoxx-freelance/trader-sioux-summaries/blob/master/script_CSP-friendly">script_CSP-friendly.js</a>
+
 Optionnel, si vous souhaitez exécuter le script à nouveau (après une actualisation ou autre)
 
-8. Toujours dans la Console de l'inspecteur, appuyer sur <kbd>Flèche Haut</kbd>
-9. Appuyez sur <kbd>Enter</kbd> afin d'executer le script à nouveau
+8. N'hésitez pas à redimenssionner la console ou à la fermer avec <kbd>F12</kbd> ou en appuyant sur la croix
+9. Toujours dans la Console de l'inspecteur, appuyer sur <kbd>Flèche Haut</kbd>
+10. Appuyez sur <kbd>Enter</kbd> afin d'executer le script à nouveau
 
 
 Tips: Vous pouvez modifier de la ligne 7 à 11 en assigant les valeurs que vous avez transféré sur votre compte spot : 
