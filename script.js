@@ -107,6 +107,7 @@ jqueryScript.onload = function() {
     
         tableDataReversed.forEach(function(t) {
             let actualBotIdAndPos = `${t[2]} #${t[3]}`;
+            let dateOfTrade = convertToDateObject(t[1]);
             let currency = t[8].split(" ")[1];
             let qty = parseFloat(t[6].split(" ")[0]);
             let pos = parseFloat(t[8].split(" ")[0]);
@@ -155,11 +156,11 @@ jqueryScript.onload = function() {
                     cumulativePos[t[2]] = 0;
                 }
                 cumulativePos[t[2]] += pnl;
-                chartData[t[2]].push({x:convertToDateObject(t[1]), y:cumulativePos[t[2]]});
+                chartData[t[2]].push({x:dateOfTrade, y:cumulativePos[t[2]]});
                 
                 if(currency === 'USDT'){
                     cumulativePos['USDT'] += pnl;
-                    chartData['USDT'].push({x:convertToDateObject(t[1]), y:cumulativePos['USDT']});
+                    chartData['USDT'].push({x:dateOfTrade, y:cumulativePos['USDT']});
                 }
                 
                 if(bots[t[2]] && bots[t[2]][1] !== undefined && bots[t[2]][1] > 0){
@@ -169,8 +170,10 @@ jqueryScript.onload = function() {
                         cumulativeDrawdown[currency] = 0;
                     }
                     
+                    drawdown[currency].push({x: (new Date(dateOfTrade.getTime() - 1)), y:cumulativeDrawdown[currency]});
+                    
                     cumulativeDrawdown[currency] += ((t[5] === 'buy')?(pos*(-1)):pos)
-                    drawdown[currency].push({x:convertToDateObject(t[1]), y:cumulativeDrawdown[currency]});
+                    drawdown[currency].push({x:dateOfTrade, y:cumulativeDrawdown[currency]});
                 }
         
                 assets[t[2]] = asset;
@@ -240,11 +243,12 @@ jqueryScript.onload = function() {
     
 
     function showChart() {
+        let canvaStyle = 'style="width:100%; max-height:340px;"';
         $('p#botsChartText').remove();
         $('canvas#botsChart').remove();
         $('canvas#drawdownChart').remove();
         $('canvas#profitChart').remove();
-        $('.container h1').append('<canvas id="drawdownChart" style="width:100%;"></canvas><p id="botsChartText" style="font-size: 12px; margin:0;">Cliquez sur la légende pour filtrer les paires :</p><canvas id="profitChart" style="width:100%;"></canvas>');
+        $('.container h1').append('<canvas id="drawdownChart" '+canvaStyle+'></canvas><p id="botsChartText" style="font-size: 12px; margin:0;">Cliquez sur la légende pour filtrer les paires :</p><canvas id="profitChart" '+canvaStyle+'></canvas>');
         console.log(chartData);
     
         
@@ -255,10 +259,10 @@ jqueryScript.onload = function() {
             chartTimeScript.setAttribute('src', 'https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns');
             chartTimeScript.onload = function() {
 
-                
+                let colorGraphLine = {'USDT': 'rgba(83, 225, 214, 1)', 'ETH': 'rgba(190, 200, 190, 1)', 'BTC': 'rgba(200, 100, 143, 1)'}
                 let datasets = [];
                 Object.entries(drawdown).forEach(([k, v]) => {
-                    datasets.push({label: 'DrawDown ' + k, data: v, fill: false, borderColor: (k === 'USDT')?'rgba(112, 225, 221, 1)':getRandomColor(), yAxisID: (k === 'USDT')?'y-axis-1':'y-axis-2',});
+                    datasets.push({label: 'DrawDown ' + k, data: v, fill: false, borderColor: colorGraphLine[k], yAxisID: (k === 'USDT')?'y-axis-1':'y-axis-2',});
                 });
                 
                 let chart = new Chart('drawdownChart', {
@@ -327,8 +331,8 @@ jqueryScript.onload = function() {
                                     type: 'time',
                                     time: {
                                         unit: 'day',
-                                        tooltipFormat: 'dd/MM/yyyy HH:mm:ss',
-                                        displayFormats: {day: 'dd/MM/yyyy'}
+                                        tooltipFormat: 'dd/MM/yyyy',
+                                        displayFormats: {day: 'dd/MM'}
                                     },
                                     title: {display: true, text: 'Date'}
                                 },
