@@ -12,7 +12,7 @@ jqueryScript.onload = function() {
     
     let tableData = [];
     let chartData = {};
-    let cumulativePos = {};
+    let drawdown = {};
     let summary = {}; // qty, pnl
     let assets = {};  // asset, qty, nbr, nbrTP, pnl
     let assetActive = {};
@@ -100,11 +100,14 @@ jqueryScript.onload = function() {
         let tableDataReversed = tableData.reverse();
         let trade = ['', 0, 0, 0, 0]; // [actualBotIdAndPos, qty, priceBuy, priceSell, pnl];
         let botIdAndPos = '';
+        let cumulativePos = {};
+        let cumulativeDrawdown = {};
         chartData['USDT'] = [];
         cumulativePos['USDT'] = 0;
     
         tableDataReversed.forEach(function(t) {
             let actualBotIdAndPos = `${t[2]} #${t[3]}`;
+            let currency = t[8].split(" ")[1];
             let qty = parseFloat(t[6].split(" ")[0]);
             let pos = parseFloat(t[8].split(" ")[0]);
             /*if(t[8].split(" ")[1] === 'USDT' && t[2] == 'AR-USDT'){
@@ -154,11 +157,21 @@ jqueryScript.onload = function() {
                 cumulativePos[t[2]] += pnl;
                 chartData[t[2]].push({x:convertToDateObject(t[1]), y:cumulativePos[t[2]]});
                 
-                if(t[8].split(" ")[1] === 'USDT'){
+                if(currency === 'USDT'){
                     cumulativePos['USDT'] += pnl;
                     chartData['USDT'].push({x:convertToDateObject(t[1]), y:cumulativePos['USDT']});
                 }
-                //debug([pos, trade, asset[3]], t[2], 'BLAST-USDT');
+                
+                if(bots[t[2]] && bots[t[2]][1] !== undefined && bots[t[2]][1] > 0){
+                    
+                    if (!drawdown[currency]) {
+                        drawdown[currency] = [];
+                        cumulativeDrawdown[currency] = 0;
+                    }
+                    
+                    cumulativeDrawdown[currency] += ((t[5] === 'buy')?(pos*(-1)):pos)
+                    drawdown[currency].push({x:convertToDateObject(t[1]), y:cumulativeDrawdown[currency]});
+                }
         
                 assets[t[2]] = asset;
             }
@@ -229,8 +242,9 @@ jqueryScript.onload = function() {
     function showChart() {
         $('p#botsChartText').remove();
         $('canvas#botsChart').remove();
+        $('canvas#drawdownChart').remove();
         $('canvas#profitChart').remove();
-        $('.container h1').append('<p id="botsChartText" style="font-size: 12px; margin:0;">Cliquez sur la légende pour filtrer les paires :</p><canvas id="profitChart" style="width:100%;"></canvas>');
+        $('.container h1').append('<canvas id="drawdownChart" style="width:100%;"></canvas><p id="botsChartText" style="font-size: 12px; margin:0;">Cliquez sur la légende pour filtrer les paires :</p><canvas id="profitChart" style="width:100%;"></canvas>');
         console.log(chartData);
     
         
@@ -241,13 +255,13 @@ jqueryScript.onload = function() {
             chartTimeScript.setAttribute('src', 'https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns');
             chartTimeScript.onload = function() {
 
-                /*
+                
                 let datasets = [];
-                Object.entries(chartData).forEach(([k, v]) => {
-                    datasets.push({label: k, data: v, fill: false, borderColor: getRandomColor(), tension: 0.1});
+                Object.entries(drawdown).forEach(([k, v]) => {
+                    datasets.push({label: 'DrawDown ' + k, data: v, fill: false, borderColor: (k === 'USDT')?'rgba(112, 225, 221, 1)':getRandomColor(), yAxisID: (k === 'USDT')?'y-axis-1':'y-axis-2',});
                 });
                 
-                let chart = new Chart('botsChart', {
+                let chart = new Chart('drawdownChart', {
                     type: 'line',
                     data: {datasets: datasets},
                     options: {
@@ -257,17 +271,23 @@ jqueryScript.onload = function() {
                                 time: {
                                     unit: 'day',
                                     tooltipFormat: 'dd/MM/yyyy HH:mm:ss',
-                                    displayFormats: {day: 'dd/MM/yyyy'}
+                                    displayFormats: {day: 'dd/MM'}
                                 },
                                 title: {display: true, text: 'Date'}
                             },
-                            y: {
-                                beginAtZero: true,
-                                title: {display: true, text: 'Value'}
+                            'y-axis-1': {
+                                type: 'linear',
+                                position: 'left',
+                                title: {display: true, text: 'USDT'}
+                            },
+                            'y-axis-2': {
+                                type: 'linear',
+                                position: 'right',
+                                title: {display: true, text: 'BTC | ETH'}
                             }
                         }
                     }
-                });*/
+                });
 
 
 
@@ -281,7 +301,7 @@ jqueryScript.onload = function() {
                     
                     let datasets = [];
                     datasets.push({
-                        label: 'USDT - Bar Chart',
+                        label: 'USDT - Profits',
                         data: financialData
                     });
                     
