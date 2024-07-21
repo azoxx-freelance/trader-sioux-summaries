@@ -32,7 +32,7 @@ Créer afin d'ajouter les éléments de statistique résumant les stats des bots
 7. Appuyez sur <kbd>Enter</kbd> afin d'executer le script
 8. N'hésitez pas à redimenssionner la console ou à la fermer avec <kbd>F12</kbd> ou en appuyant sur la croix
 
-/!\ Si vous avez une erreur type CSP (Content Security Policy) lors de l'execution, utilisez plutot : <a href="https://github.com/azoxx-freelance/trader-sioux-summaries/blob/master/script_CSP-friendly">script_CSP-friendly.js</a>
+⚠️ Si vous avez une erreur type CSP (Content Security Policy) lors de l'execution, utilisez plutot : <a href="https://github.com/azoxx-freelance/trader-sioux-summaries/blob/master/script_CSP-friendly">script_CSP-friendly.js</a>
 
 Optionnel, si vous souhaitez exécuter le script à nouveau (après une actualisation ou autre)
 
