@@ -30,12 +30,12 @@ Créer afin d'ajouter les éléments de statistique résumant les stats des bots
 5. Copier le contenu de <a href="https://github.com/azoxx-freelance/trader-sioux-summaries/blob/master/script.js">script.js</a>
 6. Collez le code dans la console que vous avez ouverte précédament
 7. Appuyez sur <kbd>Enter</kbd> afin d'executer le script
+8. N'hésitez pas à redimenssionner la console ou à la fermer avec <kbd>F12</kbd> ou en appuyant sur la croix
 
 /!\ Si vous avez une erreur type CSP (Content Security Policy) lors de l'execution, utilisez plutot : <a href="https://github.com/azoxx-freelance/trader-sioux-summaries/blob/master/script_CSP-friendly">script_CSP-friendly.js</a>
 
 Optionnel, si vous souhaitez exécuter le script à nouveau (après une actualisation ou autre)
 
-8. N'hésitez pas à redimenssionner la console ou à la fermer avec <kbd>F12</kbd> ou en appuyant sur la croix
 9. Toujours dans la Console de l'inspecteur, appuyer sur <kbd>Flèche Haut</kbd>
 10. Appuyez sur <kbd>Enter</kbd> afin d'executer le script à nouveau
 
