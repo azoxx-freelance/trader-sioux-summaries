@@ -15,7 +15,6 @@ jqueryScript.onload = function() {
     let drawdown = {};
     let summary = {}; // qty, pnl
     let assets = {};  // asset, qty, nbr, nbrTP, pnl
-    let assetActive = {};
     let trades = [];
     let bots = {
         'BTC-USDT': [28, 3000],
@@ -67,11 +66,49 @@ jqueryScript.onload = function() {
         let tableDataReversed = tableData.reverse();
         let trade = ['', 0, 0, 0, 0]; // [actualBotIdAndPos, qty, priceBuy, priceSell, pnl];
         let botIdAndPos = '';
+        let assetActive = {};
+        let assetPosActive = {};
         let cumulativePos = {};
         let cumulativeDrawdown = {};
         chartData['USDT'] = [];
         cumulativePos['USDT'] = 0;
-    
+
+
+        // --- FILTER DATA ---  //
+        let deleteOrdersID = {};
+        for (let i = 0; i < tableDataReversed.length; i++) {
+            let t = tableDataReversed[i];
+            let qty = parseFloat(t[6].split(" ")[0]);
+            let pos = parseFloat(t[8].split(" ")[0]);
+
+            if (!assetActive[t[2]]) {
+                assetActive[t[2]] = 0;
+            }
+
+            let deleteKey = t[2]+t[3];
+            if (!deleteOrdersID[deleteKey]) {
+                deleteOrdersID[deleteKey] = [];
+            }
+            
+            if (t[5] === 'buy') {
+                assetActive[t[2]] += qty;
+                deleteOrdersID[deleteKey].push(i);
+            } else {
+                deleteOrdersID[deleteKey].push(i);
+                if(assetActive[t[2]].toFixed(6) === qty.toFixed(6) || (t[2] === 'BGB-USDT' && assetActive[t[2]].toFixed(0) === qty.toFixed(0))) {
+                    deleteOrdersID[deleteKey] = [];
+                }
+                assetActive[t[2]] = 0;
+            }
+        }
+        
+        Object.entries(deleteOrdersID).forEach(([k, v]) => {
+            v.forEach(function(id) {
+                delete tableDataReversed[id];
+            });
+        });
+        
+        
         tableDataReversed.forEach(function(t) {
             let actualBotIdAndPos = `${t[2]} #${t[3]}`;
             let dateOfTrade = convertToDateObject(t[1]);
@@ -87,7 +124,8 @@ jqueryScript.onload = function() {
                 if (!assets[t[2]]) {
                     assets[t[2]] = [0, 0, 0, 0, 0];
                 }
-                if (!assetActive[t[2]]) {
+                if (!assetPosActive[t[2]]) {
+                    assetPosActive[t[2]] = 0;
                     assetActive[t[2]] = 0;
                 }
                 let asset = assets[t[2]];
@@ -106,15 +144,17 @@ jqueryScript.onload = function() {
                     asset[1] += qty;
                     asset[3] -= pos;
                     asset[4]++;
-                    assetActive[t[2]] += pos;
+                    assetActive[t[2]] += qty;
+                    assetPosActive[t[2]] += pos;
                 } else {
-                    pnl = pos - assetActive[t[2]];
+                    pnl = pos - assetPosActive[t[2]];
                     trade = [trade[0], qty, trade[2], pos, pnl];
                     asset[0] = 0;
                     asset[1] = 0;
                     asset[2] += 1;
                     asset[3] += pos;
                     asset[4] = 0;
+                    assetPosActive[t[2]] = 0;
                     assetActive[t[2]] = 0;
                 }
                 
