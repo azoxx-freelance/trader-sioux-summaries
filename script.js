@@ -109,6 +109,7 @@ jqueryScript.onload = function() {
 
         // --- FILTER DATA ---  //
         let deleteOrdersID = {};
+        let deleteOrdersID_temp = {};
         for (let i = 0; i < tableDataReversed.length; i++) {
             let t = tableDataReversed[i];
             let qty = parseFloat(t[6].split(" ")[0]);
@@ -121,17 +122,18 @@ jqueryScript.onload = function() {
             let deleteKey = t[2]+t[3];
             if (!deleteOrdersID[deleteKey]) {
                 deleteOrdersID[deleteKey] = [];
+                deleteOrdersID_temp[deleteKey] = [];
             }
             
             if (t[5] === 'buy') {
                 assetActive[t[2]] += qty;
-                deleteOrdersID[deleteKey].push(i);
+                deleteOrdersID_temp[deleteKey].push(i);
             } else {
-                deleteOrdersID[deleteKey].push(i);
-                console.log(t[2] + ': ' + assetActive[t[2]] + ' - ' + qty);
+                deleteOrdersID_temp[deleteKey].push(i);
                 if(assetActive[t[2]].toFixed(6) === qty.toFixed(6) || (t[2] === 'BGB-USDT' && assetActive[t[2]].toFixed(0) === qty.toFixed(0))) {
-                    console.log('clean');
-                    deleteOrdersID[deleteKey] = [];
+                    deleteOrdersID_temp[deleteKey] = [];
+                } else {
+                    deleteOrdersID[deleteKey] = deleteOrdersID_temp[deleteKey];
                 }
                 assetActive[t[2]] = 0;
             }
