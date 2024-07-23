@@ -10,6 +10,7 @@
 <li><a href="#about-the-project">About The Project</a></li>
 <li><a href="#getting-started">Getting Started</a></li>
 <li><a href="#result">Result</a></li>
+<li><a href="#buy-me-a-coffee">Buy Me A Coffee</a></li>
 
 
 
@@ -54,5 +55,22 @@ Tips: Vous pouvez modifier de la ligne 7 à 11 en assigant les valeurs que vous 
 
 <img src="https://i.imgur.com/NJqlgJH.png" alt="Logo">
 <img src="https://i.imgur.com/BE5ihkp.png" alt="Logo">
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+## Buy Me a Coffee
+
+Si vous souhaitez soutenir mon travail, ce qui n'est absoluement pas obligatoirrre, voici mon adresse bitget :<br> `0x384b21514abfbff09e1c03dafc3aac58dac830c1`<br>
+Celle-ci supporte les réseaux suivant : ERC20, BEP20, AVAXC (C-Chain), Arbitrum One, MATIC (Polygon).<br>
+Privilégiez l'USDT puisque pour les ETH ou BTC, seul le réseau BEP20  assurera le transfert
+<br>
+<br>
+Ou sinon, vous pouvez le faire par paypal :
+<a href="https://www.paypal.com/donate/?hosted_button_id=NDTT9M5D6BG4U">
+  <img src="https://raw.githubusercontent.com/stefan-niedermann/paypal-donate-button/master/paypal-donate-button.png" alt="Donate with PayPal" />
+</a>
+
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
