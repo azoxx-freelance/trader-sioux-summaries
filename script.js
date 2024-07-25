@@ -541,8 +541,8 @@ function convertToDailyFinancialData(data, currency='USDT') {
             financialData.push({
                 x: allDates[i].getTime(),
                 o: lastClose,
-                h: yValues.length ? roundNumber(Math.max(...yValues), 2, currency) : lastClose,
-                l: lastClose,
+                h: (yValues.length ? roundNumber(Math.max(...yValues), 2, currency) : lastClose)*1.03,
+                l: lastClose*0.97,
                 c: yValues.length ? roundNumber(yValues[yValues.length - 1], 2, currency) : lastClose
             });
     
