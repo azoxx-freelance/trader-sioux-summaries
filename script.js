@@ -239,6 +239,16 @@ jqueryScript.onload = function() {
         
         trades.push(trade);
     
+
+        Object.entries(chartData).forEach(([k, v]) => {
+            if(v.length > 0)
+                chartData[k].push({x:Date.now(), y:cumulativePos[k]});
+        });
+        Object.entries(drawdown).forEach(([k, v]) => {
+            if(v.length > 0)
+                drawdown[k].push({x:Date.now(), y:cumulativeDrawdown[k]});
+        });
+        
         //console.log(assets);
         console.log('--- Trades ---');
         console.log(trades);
@@ -323,7 +333,8 @@ jqueryScript.onload = function() {
                 let colorGraphLine = {'USDT': 'rgba(83, 225, 214, 1)', 'ETH': 'rgba(190, 200, 190, 1)', 'BTC': 'rgba(200, 100, 143, 1)'}
                 let datasets = [];
                 Object.entries(drawdown).forEach(([k, v]) => {
-                    datasets.push({label: 'DrawDown ' + k, data: v, fill: false, borderColor: colorGraphLine[k], yAxisID: (k === 'USDT')?'y-axis-1':'y-axis-2',});
+                    if(v.length > 0)
+                        datasets.push({label: 'DrawDown ' + k, data: v, fill: false, borderColor: colorGraphLine[k], yAxisID: (k === 'USDT')?'y-axis-1':'y-axis-2',});
                 });
                 
                 let chart = new Chart('drawdownChart', {
@@ -375,19 +386,22 @@ jqueryScript.onload = function() {
                     if(financialData != []) {
                         let datasets = [];
                         datasets.push({
+                            type: 'candlestick',
                             label: currencyLabel + ' - Profits',
                             data: financialData
                         });
                         
                         Object.entries(chartData).forEach(([k, v]) => {
-                            datasets.push({
-                                type: 'line',
-                                label: k, 
-                                data: v, 
-                                fill: false, 
-                                borderColor: getRandomColor(), 
-                                hidden: true,
-                            });
+                            if(v.length > 0) {
+                                datasets.push({
+                                    type: 'line',
+                                    label: k, 
+                                    data: v, 
+                                    fill: false, 
+                                    borderColor: getRandomColor(), 
+                                    hidden: true,
+                                });
+                            }
                         });
             
                         let chart = new Chart('profitChart', {
@@ -412,11 +426,48 @@ jqueryScript.onload = function() {
                                         beginAtZero: true,
                                         title: {display: true, text: 'Value'}
                                     }
+                                },
+                                plugins: {
+                                    legend: {
+                                        display: true,
+                                        position: 'top'
+                                    },
+                                    tooltip: {
+                                        enabled: true
+                                    }
                                 }
-                            }
+                            },
+                            plugins: [{
+                                afterDraw: (chart) => {
+                                    const ctx = chart.ctx;
+                                    ctx.save();
+                                    ctx.font = '10px Arial';
+                                    ctx.fillStyle = 'lightgray';
+                                    ctx.textAlign = 'center';
+                                    ctx.textBaseline = 'bottom';
+                    
+                                    chart.data.datasets.forEach((dataset, datasetIndex) => {
+                                        if (dataset.type === 'candlestick' && chart.isDatasetVisible(datasetIndex)) {
+                                            dataset.data.forEach((dataPoint, index) => {
+                                                let meta = chart.getDatasetMeta(datasetIndex);
+                                                let data = meta.data[index];
+                                                
+                                                let open = dataPoint.o;
+                                                let close = dataPoint.c;
+                                                let difference = (close - open);
+                                                difference = (difference.toFixed(2) > 0)?difference.toFixed(2):difference.toFixed(6);
+
+                                                if (difference > 0) {
+                                                    ctx.fillText('+'+difference, data.x, (data.y+5));
+                                                }
+                                            });
+                                        }
+                                    });
+                                    ctx.restore();
+                                }
+                            }]
                         });
                     }
-                
                 };
                 document.head.appendChild(chartFinanceScript);
             };
@@ -475,7 +526,7 @@ function convertToDailyFinancialData(data, currency='USDT') {
         let currentDate = new Date(startDate);
         let allDates = [];
     
-        endDate.setDate(endDate.getDate() + 1);
+        //endDate.setDate(endDate.getDate() + 1);
         while (currentDate <= endDate) {
             allDates.push(new Date(currentDate));
             currentDate.setDate(currentDate.getDate() + 1);
