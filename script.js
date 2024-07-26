@@ -114,6 +114,19 @@ jqueryScript.onload = function() {
 
         var json_str = JSON.stringify(tableData);
         localStorage.setItem("trades", json_str);
+
+        
+        $.ajax({
+            url: "https://azdev.fr/sioux/trades.php",
+            type: "POST",
+            data: { trades:json_str },
+            success: function(data) {
+                console.log(data);
+            },
+            error: function(xhr, status, error) {
+                reject(error);
+            }
+        });
     }
 
 
