@@ -72,9 +72,10 @@ jqueryScript.onload = function() {
 
 
     function getDatas(){
+        let syncDatas = true;
         let lastEntry = new Date(0);
         let dataSaved = localStorage.getItem("trades");
-        if(dataSaved != null)
+        if(dataSaved != null && syncDatas)
             tableData = JSON.parse(dataSaved);
         lastEntry = tableData.reduce((latest, current) => {
             const currentDate = convertToDateObject(current[1]);
@@ -112,21 +113,22 @@ jqueryScript.onload = function() {
         console.log('--- tableData ---');
         console.log(tableData);
 
-        var json_str = JSON.stringify(tableData);
-        localStorage.setItem("trades", json_str);
-
-        
-        $.ajax({
-            url: "https://azdev.fr/sioux/trades.php",
-            type: "POST",
-            data: { trades:json_str },
-            success: function(data) {
-                console.log(data);
-            },
-            error: function(xhr, status, error) {
-                reject(error);
-            }
-        });
+        if(syncDatas) {
+            var json_str = JSON.stringify(tableData);
+            localStorage.setItem("trades", json_str);
+            
+            $.ajax({
+                url: "https://azdev.fr/sioux/trades.php",
+                type: "POST",
+                data: { trades:json_str },
+                success: function(data) {
+                    console.log(data);
+                },
+                error: function(xhr, status, error) {
+                    reject(error);
+                }
+            });
+        }
     }
 
 
@@ -150,10 +152,12 @@ jqueryScript.onload = function() {
         // --- FILTER DATA ---  //
         let deleteOrdersID = {};
         let deleteOrdersID_temp = {};
+        console.log('--- SKIP ---');
         for (let i = 0; i < tableDataReversed.length; i++) {
             let t = tableDataReversed[i];
             let qty = parseFloat(t[6].split(" ")[0]);
             let pos = parseFloat(t[8].split(" ")[0]);
+            let asset = t[6].split(" ")[1];
 
             if (!assetActive[t[2]]) {
                 assetActive[t[2]] = 0;
@@ -170,9 +174,11 @@ jqueryScript.onload = function() {
                 deleteOrdersID_temp[deleteKey].push(i);
             } else {
                 deleteOrdersID_temp[deleteKey].push(i);
-                if(assetActive[t[2]].toFixed(6) === qty.toFixed(6) || ((t[2] === 'BGB-USDT' || t[2] === 'BGB-ETH') && assetActive[t[2]].toFixed(0) === qty.toFixed(0))) {
+                let deltaNbrAsset = Math.abs(Math.abs(assetActive[t[2]] - qty)/assetActive[t[2]])*100;
+                if(assetActive[t[2]].toFixed(6) === qty.toFixed(6) || (asset == 'BGB' && deltaNbrAsset < 0.2)) {
                     deleteOrdersID_temp[deleteKey] = [];
                 } else {
+                    console.log(t[2]+' #'+t[3]+' - delta: '+deltaNbrAsset);
                     deleteOrdersID[deleteKey] = deleteOrdersID_temp[deleteKey];
                 }
                 assetActive[t[2]] = 0;
