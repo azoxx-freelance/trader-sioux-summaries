@@ -71,6 +71,17 @@ jqueryScript.onload = function() {
 
 
     function getDatas(){
+        let lastEntry = new Date(0);
+        let dataSaved = localStorage.getItem("trades");
+        if(dataSaved != null)
+            tableData = JSON.parse(dataSaved);
+        lastEntry = tableData.reduce((latest, current) => {
+            const currentDate = convertToDateObject(current[1]);
+            return (currentDate > latest) ? currentDate : latest;
+        }, new Date(0));
+        console.log('--- lastEntry ---');
+        console.log(lastEntry);
+        
         let id = 0;
         document.querySelectorAll('.table-striped tbody tr').forEach(function(row) {
             
@@ -86,12 +97,22 @@ jqueryScript.onload = function() {
                     let asset = `${cells[5].innerText.split(" ")[1]}-${cells[6].innerText.split(" ")[1]}`;
                     cells[1].innerText = asset;
             
+                    let dateOfEntry = convertToDateObject(cells[0].innerText);
                     let rowData = [id, ...Array.from(cells, cell => cell.innerText)];
-                    tableData.push(rowData);
+                    if(dateOfEntry > lastEntry) {
+                        tableData.push(rowData);
+                        console.log(rowData);
+                    }
                 }
             }
             id++;
         });
+        
+        console.log('--- tableData ---');
+        console.log(tableData);
+
+        var json_str = JSON.stringify(tableData);
+        localStorage.setItem("trades", json_str);
     }
 
 
