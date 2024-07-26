@@ -25,6 +25,7 @@ jqueryScript.onload = function() {
         'ETH-BTC': [64, 0],
         'PAXG-USDT': [73, 0],
         'BGB-ETH': [77, 0],
+        'BGB-BTC': [78, 0],
         
         'BLAST-USDT': [58, 0],
         'AR-USDT': [69, 0]
