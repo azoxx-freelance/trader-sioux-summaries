@@ -272,6 +272,8 @@ jqueryScript.onload = function() {
         });
         
         //console.log(assets);
+        console.log('--- Assets ---');
+        console.log(assets);
         console.log('--- Trades ---');
         console.log(trades);
         console.log('--- DrawDown ---');
@@ -286,9 +288,13 @@ jqueryScript.onload = function() {
     
         // Générer le HTML pour les actifs
         let assetsHTML = '<table id="table_assets" class="table table-striped" style="font-size:13px; margin-top:30px;"><thead><tr><th>Asset</th><th>Profit</th><th>Nbr TP</th><th>Position n°</th><th>Liquidité active / assignée</th><th>Qty Actif</th><th>Prix moyen</th><th>TP Cible</th></tr></thead><tbody>';
-        Object.entries(assets).forEach(([k, v]) => {
-            if(bots[k] && bots[k][1] !== undefined && bots[k][1] > 0){
+        Object.entries(bots).forEach(([k, bot]) => {
+            if(bot[1] !== undefined && bot[1] > 0){
                 let [_a, _b] = k.split('-');
+                let v = assets[k];
+                if (!v) {
+                    v = [0, 0, 0, 0, 0];
+                }
                 let avg_price = v[0] / v[1];
                 
                 if (!summary[_b]) {
@@ -300,7 +306,7 @@ jqueryScript.onload = function() {
                 
                 assetsHTML += `<tr>
                     <td class="text-center">${k}</td>
-                    <td class="text-center">${((pnl == 0)?'':roundNumber(pnl, 2, _b) + ' ' + _b + ' (' +  roundNumber(100*pnl/(bots[k][1]+v[0]), 2) + '%)')}</td>
+                    <td class="text-center">${((pnl == 0)?'':roundNumber(pnl, 2, _b) + ' ' + _b + ' (' + roundNumber(100*pnl/(bots[k][1]+v[0]), 2) + '%)')}</td>
                     <td class="text-center">${(v[2]==0)?'':v[2]}</td>
                     <td class="text-center">${((v[4]==0)?'':v[4]+'/8')}</td>
                     <td class="text-center">${roundNumber(v[0], 2, _b)} / ${roundNumber(bots[k][1]+v[0], 2, _b)} ${_b}</td>
