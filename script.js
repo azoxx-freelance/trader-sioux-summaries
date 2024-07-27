@@ -5,7 +5,7 @@ jqueryScript.onload = function() {
     $('table#table_summary, table#table_assets').remove();
 
     let spotAssetTransferred = {
-        'USDT': 670,
+        'USDT': 6000,
         'ETH': 0.3,
         'BTC': 0.07,
     };
@@ -75,6 +75,7 @@ jqueryScript.onload = function() {
         let syncDatas = true;
         let lastEntry = new Date(0);
         let dataSaved = localStorage.getItem("trades");
+        //let dataSaved = null;
         if(dataSaved != null && syncDatas)
             tableData = JSON.parse(dataSaved);
         lastEntry = tableData.reduce((latest, current) => {
@@ -83,6 +84,9 @@ jqueryScript.onload = function() {
         }, new Date(0));
         console.log('--- lastEntry ---');
         console.log(lastEntry);
+        
+        console.log('--- tableData0 ---');
+        console.log(tableData);
         
         let id = 0;
         document.querySelectorAll('.table-striped tbody tr').forEach(function(row) {
@@ -109,8 +113,18 @@ jqueryScript.onload = function() {
             }
             id++;
         });
+
+        console.log('--- tableData1 ---');
+        console.log(tableData);
+
         
-        console.log('--- tableData ---');
+        tableData.sort((a, b) => {
+            let dateA = convertToDateObject(a[1]);
+            let dateB = convertToDateObject(b[1]);
+            return dateB - dateA;
+        });
+        
+        console.log('--- tableData2 ---');
         console.log(tableData);
 
         if(syncDatas) {
