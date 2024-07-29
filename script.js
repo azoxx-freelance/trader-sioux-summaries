@@ -2,7 +2,7 @@
 var jqueryScript = document.createElement('script');
 jqueryScript.setAttribute('src', 'https://code.jquery.com/jquery-3.6.0.min.js');
 jqueryScript.onload = function() {
-    $('table#table_summary, table#table_assets').remove();
+    $('table#table_summary, table#table_assets, .elem_summaries').remove();
 
     let spotAssetTransferred = {
         'USDT': 6000,
@@ -209,6 +209,7 @@ jqueryScript.onload = function() {
         tableDataReversed.forEach(function(t) {
             let actualBotIdAndPos = `${t[2]} #${t[3]}`;
             let dateOfTrade = convertToDateObject(t[1]);
+            let _dateOfTrade = (new Date(dateOfTrade.getTime() - 1))
             let currency = t[8].split(" ")[1];
             let qty = parseFloat(t[6].split(" ")[0]);
             let pos = parseFloat(t[8].split(" ")[0]);
@@ -259,18 +260,22 @@ jqueryScript.onload = function() {
                     chartData[t[2]] = [];
                     cumulativePos[t[2]] = 0;
                 }
+                chartData[t[2]].push({x:_dateOfTrade, y:cumulativePos[t[2]]});
                 cumulativePos[t[2]] += pnl;
                 chartData[t[2]].push({x:dateOfTrade, y:cumulativePos[t[2]]});
                 
                 if(currency === 'USDT'){
+                    chartData['USDT'].push({x:_dateOfTrade, y:cumulativePos['USDT']});
                     cumulativePos['USDT'] += pnl;
                     chartData['USDT'].push({x:dateOfTrade, y:cumulativePos['USDT']});
                 }
                 if(currency === 'ETH'){
+                    chartData['ETH'].push({x:_dateOfTrade, y:cumulativePos['ETH']});
                     cumulativePos['ETH'] += pnl;
                     chartData['ETH'].push({x:dateOfTrade, y:cumulativePos['ETH']});
                 }
                 if(currency === 'BTC'){
+                    chartData['BTC'].push({x:_dateOfTrade, y:cumulativePos['BTC']});
                     cumulativePos['BTC'] += pnl;
                     chartData['BTC'].push({x:dateOfTrade, y:cumulativePos['BTC']});
                 }
@@ -282,7 +287,7 @@ jqueryScript.onload = function() {
                         cumulativeDrawdown[currency] = 0;
                     }
                     
-                    drawdown[currency].push({x: (new Date(dateOfTrade.getTime() - 1)), y:cumulativeDrawdown[currency]});
+                    drawdown[currency].push({x:_dateOfTrade, y:cumulativeDrawdown[currency]});
                     
                     cumulativeDrawdown[currency] += ((t[5] === 'buy')?(pos*(-1)):pos)
                     drawdown[currency].push({x:dateOfTrade, y:cumulativeDrawdown[currency]});
@@ -320,7 +325,7 @@ jqueryScript.onload = function() {
     function showStats(){
     
         // Générer le HTML pour les actifs
-        let assetsHTML = '<table id="table_assets" class="table table-striped" style="font-size:13px; margin-top:30px;"><thead><tr><th>Asset</th><th>Profit</th><th>Nbr TP</th><th>Position n°</th><th>Liquidité active / assignée</th><th>Qty Actif</th><th>Prix moyen</th><th>TP Cible</th></tr></thead><tbody>';
+        let assetsHTML = '<table id="table_assets" class="table table-striped" style="font-size:13px; margin-top:30px;"><thead><tr><th>Asset</th><th>Profit</th><th>Nbr TP</th><th>Palier n°</th><th>Liquidité active / assignée</th><th>Qty Actif</th><th>Prix moyen</th><th>TP Cible Estimé**</th></tr></thead><tbody>';
         Object.entries(bots).forEach(([k, bot]) => {
             if(bot[1] !== undefined && bot[1] > 0){
                 let [_a, _b] = k.split('-');
@@ -350,6 +355,7 @@ jqueryScript.onload = function() {
             }
         });
         assetsHTML += '</tbody></table>';
+        assetsHTML += '<p class="elem_summaries" style="font-size: 12px;">**Disclaimer, le calcul du TP cible est une estimation qui se base sur VOS  données qui ne sont éventuellement pas complète. Avant d\'alerter l\'équipe veuillez prendre conscience que vous n\'avez rien à faire. S\'il y a un problème, il y aura une annonce, pas besoin de les MP. Merci</p>';
 
         
         // Générer le HTML pour le résumé
