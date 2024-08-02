@@ -5,9 +5,9 @@ jqueryScript.onload = function() {
     $('table#table_summary, table#table_assets, .elem_summaries').remove();
 
     let spotAssetTransferred = {
-        'USDT': 6000,
-        'ETH': 0.3,
-        'BTC': 0.07,
+        'USDT': 965,
+        'ETH': 0.347,
+        'BTC': 0.01753,
     };
     
     let tableData = [];
@@ -30,6 +30,8 @@ jqueryScript.onload = function() {
         'BLAST-USDT': [58, 0],
         'AR-USDT': [69, 0]
     };
+    let ponderation = [6,1,2,4,8,16,36];
+    let martingale = [100, 98.82, 97.614, 95.53, 92.72, 88.67, 82.8, 74.29];
     
     // Créer une fonction pour effectuer une requête AJAX et récupérer la valeur
     function fetchFollowerAllocation(botName, botId) {
@@ -325,7 +327,15 @@ jqueryScript.onload = function() {
     function showStats(){
     
         // Générer le HTML pour les actifs
-        let assetsHTML = '<table id="table_assets" class="table table-striped" style="font-size:13px; margin-top:30px;"><thead><tr><th>Asset</th><th>Profit</th><th>Nbr TP</th><th>Palier n°</th><th>Liquidité active / assignée</th><th>Qty Actif</th><th>Prix moyen</th><th>TP Cible Estimé**</th></tr></thead><tbody>';
+        let assetsHTML = `<table id="table_assets" class="table table-striped" style="font-size:13px; margin-top:30px;"><thead><tr>
+            <th>Asset</th><th>Profit</th>
+            <th>Nbr TP</th><th>Palier n°</th>
+            <th>Taille palier suivant**</th>
+            <th>Liquidité active / assignée</th>
+            <th>Qty Actif</th>
+            <th>Prix moyen</th>
+            <th>TP Cible Estimé**</th>
+            </tr></thead><tbody>`;
         Object.entries(bots).forEach(([k, bot]) => {
             if(bot[1] !== undefined && bot[1] > 0){
                 let [_a, _b] = k.split('-');
@@ -347,6 +357,7 @@ jqueryScript.onload = function() {
                     <td class="text-center">${((pnl == 0)?'':roundNumber(pnl, 2, _b) + ' ' + _b + ' (' + roundNumber(100*pnl/(bots[k][1]+v[0]), 2) + '%)')}</td>
                     <td class="text-center">${(v[2]==0)?'':v[2]}</td>
                     <td class="text-center">${((v[4]==0)?'':v[4]+'/8')}</td>
+                    <td class="text-center">${roundNumber((ponderation[v[4]]/133) * (bots[k][1]+v[0]), 2, _b)} ${_b}</td>
                     <td class="text-center">${roundNumber(v[0], 2, _b)} / ${roundNumber(bots[k][1]+v[0], 2, _b)} ${_b}</td>
                     <td class="text-center">${((v[1] == 0)?'':roundNumber(v[1], 6) + ' ' + _a)}</td>
                     <td class="text-center">${((v[1] == 0)?'':roundNumber(avg_price, 6, _b) + ' ' + _b)}</td>
@@ -355,7 +366,7 @@ jqueryScript.onload = function() {
             }
         });
         assetsHTML += '</tbody></table>';
-        assetsHTML += '<p class="elem_summaries" style="font-size: 12px;">**Disclaimer, le calcul du TP cible est une estimation qui se base sur VOS  données qui ne sont éventuellement pas complète. Avant d\'alerter l\'équipe veuillez prendre conscience que vous n\'avez rien à faire. S\'il y a un problème, il y aura une annonce, pas besoin de les MP. Merci</p>';
+        assetsHTML += '<p class="elem_summaries" style="font-size: 12px;">**Disclaimer, le calcul du TP cible et la taille du palier suivant sont des estimations qui se base sur VOS  données qui ne sont éventuellement pas complète. Avant d\'alerter l\'équipe veuillez prendre conscience que vous n\'avez rien à faire. S\'il y a un problème, il y aura une annonce, pas besoin de les MP. Merci</p>';
 
         
         // Générer le HTML pour le résumé
