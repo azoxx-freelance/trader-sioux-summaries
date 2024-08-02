@@ -330,11 +330,11 @@ jqueryScript.onload = function() {
         let assetsHTML = `<table id="table_assets" class="table table-striped" style="font-size:13px; margin-top:30px;"><thead><tr>
             <th>Asset</th><th>Profit</th>
             <th>Nbr TP</th><th>Palier n°</th>
-            <th>Taille palier suivant**</th>
+            <th>Taille palier suivant<span style='color:red;'>**</span></th>
             <th>Liquidité active / assignée</th>
             <th>Qty Actif</th>
             <th>Prix moyen</th>
-            <th>TP Cible Estimé**</th>
+            <th>TP Cible Estimé<span style='color:red;'>**</span></th>
             </tr></thead><tbody>`;
         Object.entries(bots).forEach(([k, bot]) => {
             if(bot[1] !== undefined && bot[1] > 0){
@@ -366,7 +366,7 @@ jqueryScript.onload = function() {
             }
         });
         assetsHTML += '</tbody></table>';
-        assetsHTML += '<p class="elem_summaries" style="font-size: 12px;">**Disclaimer, le calcul du TP cible et la taille du palier suivant sont des estimations qui se base sur VOS  données qui ne sont éventuellement pas complète. Avant d\'alerter l\'équipe veuillez prendre conscience que vous n\'avez rien à faire. S\'il y a un problème, il y aura une annonce, pas besoin de les MP. Merci</p>';
+        assetsHTML += '<p class="elem_summaries" style="font-size: 12px; color:red;">**Disclaimer, le calcul du TP cible et la taille du palier suivant sont des estimations qui se base sur VOS  données qui ne sont éventuellement pas complète dans le sens où vous être peut être entré dans un cycle ayant déja déclenché des paliers.<br />Si vous souhaitez vérifier cela, vous avez cet outils mis à disposition par Azoxx (donc non-officiel), à savoir que celui-ci n\'est pas forcément à jours non plus : <a href="https://azdev.fr/sioux/showTrades.php">ShowTrades</a><br /><br />Avant d\'alerter l\'équipe veuillez prendre conscience que vous n\'avez rien à faire sur ces bots qui fonctionnent en autonomie. S\'il y a un problème, il y aura une annonce, pas besoin de les MP. Merci</p>';
 
         
         // Générer le HTML pour le résumé
