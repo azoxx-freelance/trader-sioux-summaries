@@ -5,7 +5,7 @@ jqueryScript.onload = function() {
     $('table#table_summary, table#table_assets, .elem_summaries').remove();
 
     let spotAssetTransferred = {
-        'USDT': 965,
+        'USDT': 10000,
         'ETH': 0.347,
         'BTC': 0.01753,
     };
@@ -148,7 +148,6 @@ jqueryScript.onload = function() {
     }
 
 
-
     function processDatas(){
         let tableDataReversed = tableData.reverse();
         let trade = ['', 0, 0, 0, 0]; // [actualBotIdAndPos, qty, priceBuy, priceSell, pnl];
@@ -206,6 +205,11 @@ jqueryScript.onload = function() {
                 delete tableDataReversed[id];
             });
         });
+        Object.entries(deleteOrdersID_temp).forEach(([k, v]) => {
+            v.forEach(function(id) {
+                delete tableDataReversed[id];
+            });
+        });
         
         
         tableDataReversed.forEach(function(t) {
@@ -248,6 +252,10 @@ jqueryScript.onload = function() {
                     assetPosActive[t[2]] += pos;
                 } else {
                     pnl = pos - assetPosActive[t[2]];
+                    if(pnl < 0){
+                        pos = assetPosActive[t[2]] * 1.02;
+                        pnl = pos - assetPosActive[t[2]];
+                    }
                     trade = [trade[0], qty, trade[2], pos, pnl];
                     asset[0] = 0;
                     asset[1] = 0;
@@ -262,24 +270,27 @@ jqueryScript.onload = function() {
                     chartData[t[2]] = [];
                     cumulativePos[t[2]] = 0;
                 }
-                chartData[t[2]].push({x:_dateOfTrade, y:cumulativePos[t[2]]});
-                cumulativePos[t[2]] += pnl;
-                chartData[t[2]].push({x:dateOfTrade, y:cumulativePos[t[2]]});
+
+                if(pnl > 0) {
+                    chartData[t[2]].push({x:_dateOfTrade, y:cumulativePos[t[2]]});
+                    cumulativePos[t[2]] += pnl;
+                    chartData[t[2]].push({x:dateOfTrade, y:cumulativePos[t[2]]});
                 
-                if(currency === 'USDT'){
-                    chartData['USDT'].push({x:_dateOfTrade, y:cumulativePos['USDT']});
-                    cumulativePos['USDT'] += pnl;
-                    chartData['USDT'].push({x:dateOfTrade, y:cumulativePos['USDT']});
-                }
-                if(currency === 'ETH'){
-                    chartData['ETH'].push({x:_dateOfTrade, y:cumulativePos['ETH']});
-                    cumulativePos['ETH'] += pnl;
-                    chartData['ETH'].push({x:dateOfTrade, y:cumulativePos['ETH']});
-                }
-                if(currency === 'BTC'){
-                    chartData['BTC'].push({x:_dateOfTrade, y:cumulativePos['BTC']});
-                    cumulativePos['BTC'] += pnl;
-                    chartData['BTC'].push({x:dateOfTrade, y:cumulativePos['BTC']});
+                    if(currency === 'USDT'){
+                        chartData['USDT'].push({x:_dateOfTrade, y:cumulativePos['USDT']});
+                        cumulativePos['USDT'] += pnl;
+                        chartData['USDT'].push({x:dateOfTrade, y:cumulativePos['USDT']});
+                    }
+                    if(currency === 'ETH'){
+                        chartData['ETH'].push({x:_dateOfTrade, y:cumulativePos['ETH']});
+                        cumulativePos['ETH'] += pnl;
+                        chartData['ETH'].push({x:dateOfTrade, y:cumulativePos['ETH']});
+                    }
+                    if(currency === 'BTC'){
+                        chartData['BTC'].push({x:_dateOfTrade, y:cumulativePos['BTC']});
+                        cumulativePos['BTC'] += pnl;
+                        chartData['BTC'].push({x:dateOfTrade, y:cumulativePos['BTC']});
+                    }
                 }
                 
                 if(bots[t[2]] && bots[t[2]][1] !== undefined && bots[t[2]][1] > 0){
