@@ -368,7 +368,7 @@ jqueryScript.onload = function() {
                 
                 assetsHTML += `<tr>
                     <td class="text-center">${k}</td>
-                    <td class="text-center">${((pnl == 0)?'':roundNumber(pnl, 2, _b) + ' ' + _b + ' (' + roundNumber(100*pnl/(bots[k][1]+v[0]), 2) + '%)')}</td>
+                    <td class="text-center">${((pnl == 0)?'':roundNumber(pnl, 2, _b) + ' ' + _b + ' (' + roundNumber(100*pnl/(bots[k][2]), 2) + '%)')}</td>
                     <td class="text-center">${(v[2]==0)?'':v[2]}</td>
                     <td class="text-center">${((v[4]==0)?'':v[4]+'/8')}</td>
                     <td class="text-center">${roundNumber((ponderation[v[4]]/133) * (bots[k][2]), 2, _b)} ${_b}</td>
