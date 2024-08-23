@@ -6,8 +6,8 @@ jqueryScript.onload = function() {
 
     let spotAssetTransferred = {
         'USDT': 10000,
-        'ETH': 0.347,
-        'BTC': 0.01753,
+        'ETH': 0.6,
+        'BTC': 0.02,
     };
     
     let tableData = [];
@@ -26,6 +26,8 @@ jqueryScript.onload = function() {
         'PAXG-USDT': [73, 0],
         'BGB-ETH': [77, 0],
         'BGB-BTC': [78, 0],
+        'TRX-USDT': [79, 0],
+        'TRX-ETH': [84, 0],
         
         'BLAST-USDT': [58, 0],
         'AR-USDT': [69, 0]
@@ -40,8 +42,9 @@ jqueryScript.onload = function() {
                 url: "https://www.tradersioux.fr/copybots/" + botId,
                 type: "GET",
                 success: function(data) {
-                    let followerAllocation = $(data).find('input#follower-allocation-input[name="follower-available"]').val();
-                    resolve([botName, botId, followerAllocation]);
+                    let followerAvailable = $(data).find('input#follower-allocation-input[name="follower-available"]').val();
+                    let followerAllocation = $(data).find('input#follower-allocation-input[name="follower-allocation"]').val();
+                    resolve([botName, botId, followerAvailable, followerAllocation]);
                 },
                 error: function(xhr, status, error) {
                     reject(error);
@@ -58,8 +61,9 @@ jqueryScript.onload = function() {
     // Utiliser Promise.all pour attendre que toutes les requêtes soient terminées
     Promise.all(promises)
         .then(results => {
-            results.forEach(([botName, botId, followerAllocation]) => {
-                bots[botName][1] = parseFloat(followerAllocation);
+            results.forEach(([botName, botId, followerAvailable, followerAllocation]) => {
+                bots[botName][1] = parseFloat(followerAvailable);
+                bots[botName][2] = parseFloat(followerAllocation);
             });
             console.log('--- BOTS ---');
             console.log(bots);
@@ -336,7 +340,6 @@ jqueryScript.onload = function() {
 
 
     function showStats(){
-    
         // Générer le HTML pour les actifs
         let assetsHTML = `<table id="table_assets" class="table table-striped" style="font-size:13px; margin-top:30px;"><thead><tr>
             <th>Asset</th><th>Profit</th>
@@ -348,7 +351,7 @@ jqueryScript.onload = function() {
             <th>TP Cible Estimé<span style='color:red;'>**</span></th>
             </tr></thead><tbody>`;
         Object.entries(bots).forEach(([k, bot]) => {
-            if(bot[1] !== undefined && bot[1] > 0){
+            if(bot[1] !== undefined && bot[2] > 0){
                 let [_a, _b] = k.split('-');
                 let v = assets[k];
                 if (!v) {
@@ -360,7 +363,7 @@ jqueryScript.onload = function() {
                     summary[_b] = [0, 0, 0];
                 }
                 let pnl = v[3]+v[0];
-                summary[_b] = [summary[_b][0] + v[0], summary[_b][1] + pnl, summary[_b][2] + bots[k][1] + v[0]];
+                summary[_b] = [summary[_b][0] + v[0], summary[_b][1] + pnl, summary[_b][2] + bots[k][2]];
                 
                 
                 assetsHTML += `<tr>
@@ -368,8 +371,8 @@ jqueryScript.onload = function() {
                     <td class="text-center">${((pnl == 0)?'':roundNumber(pnl, 2, _b) + ' ' + _b + ' (' + roundNumber(100*pnl/(bots[k][1]+v[0]), 2) + '%)')}</td>
                     <td class="text-center">${(v[2]==0)?'':v[2]}</td>
                     <td class="text-center">${((v[4]==0)?'':v[4]+'/8')}</td>
-                    <td class="text-center">${roundNumber((ponderation[v[4]]/133) * (bots[k][1]+v[0]), 2, _b)} ${_b}</td>
-                    <td class="text-center">${roundNumber(v[0], 2, _b)} / ${roundNumber(bots[k][1]+v[0], 2, _b)} ${_b}</td>
+                    <td class="text-center">${roundNumber((ponderation[v[4]]/133) * (bots[k][2]), 2, _b)} ${_b}</td>
+                    <td class="text-center">${roundNumber(v[0], 2, _b)} / ${roundNumber(bots[k][2], 2, _b)} ${_b}</td>
                     <td class="text-center">${((v[1] == 0)?'':roundNumber(v[1], 6) + ' ' + _a)}</td>
                     <td class="text-center">${((v[1] == 0)?'':roundNumber(avg_price, 6, _b) + ' ' + _b)}</td>
                     <td class="text-center">${((v[1] == 0)?'':'~'+roundNumber(avg_price*1.02, 6, _b) + ' ' + _b)}</td>
