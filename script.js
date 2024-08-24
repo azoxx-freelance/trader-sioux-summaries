@@ -209,11 +209,6 @@ jqueryScript.onload = function() {
                 delete tableDataReversed[id];
             });
         });
-        Object.entries(deleteOrdersID_temp).forEach(([k, v]) => {
-            v.forEach(function(id) {
-                delete tableDataReversed[id];
-            });
-        });
         
         
         tableDataReversed.forEach(function(t) {
