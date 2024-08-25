@@ -194,7 +194,7 @@ jqueryScript.onload = function() {
             } else {
                 deleteOrdersID_temp[deleteKey].push(i);
                 let deltaNbrAsset = Math.abs(Math.abs(assetActive[t[2]] - qty)/assetActive[t[2]])*100;
-                if(assetActive[t[2]].toFixed(6) === qty.toFixed(6) || (asset == 'BGB' && deltaNbrAsset < 0.2)) {
+                if(assetActive[t[2]].toFixed(6) === qty.toFixed(6) || deltaNbrAsset < 0.5) {
                     deleteOrdersID_temp[deleteKey] = [];
                 } else {
                     console.log(t[2]+' #'+t[3]+' - delta: '+deltaNbrAsset);
