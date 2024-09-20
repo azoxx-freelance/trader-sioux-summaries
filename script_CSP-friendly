@@ -63,8 +63,11 @@ jqueryScript.onload = function() {
                     } else {
                         $(cells[4]).css("color", "green");
                     }
-                    let asset = `${cells[5].innerText.split(" ")[1]}-${cells[6].innerText.split(" ")[1]}`;
-                    cells[1].innerText = asset;
+
+                    if(cells[1].innerText == 'LIM (Jimsmore)' || cells[1].innerText == 'LIMGEM (Jimsmore)'){
+                        let asset = `${cells[5].innerText.split(" ")[1]}-${cells[6].innerText.split(" ")[1]}`;
+                        cells[1].innerText = asset;
+                    }
             
                     let dateOfEntry = convertToDateObject(cells[0].innerText);
                     let rowData = [id, ...Array.from(cells, cell => cell.innerText)];
