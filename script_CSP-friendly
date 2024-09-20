@@ -63,18 +63,23 @@ jqueryScript.onload = function() {
                     } else {
                         $(cells[4]).css("color", "green");
                     }
+
+                    let bot = `${cells[1].innerText}`;
                     
                     if(cells[1].innerText == 'LIM (Jimsmore)' || cells[1].innerText == 'LIMGEM (Jimsmore)'){
                         let asset = `LIM ${cells[5].innerText.split(" ")[1]}-${cells[6].innerText.split(" ")[1]}`;
                         cells[1].innerText = asset;
+                        bot = 'LIM';
                     }
                     if(cells[1].innerText == 'SPT PERP (Jimsmore)'){
                         let asset = `SPT ${cells[5].innerText.split(" ")[1]}-${cells[6].innerText.split(" ")[1]}`;
                         cells[1].innerText = asset;
+                        bot = 'SPT';
                     }
             
                     let dateOfEntry = convertToDateObject(cells[0].innerText);
                     let rowData = [id, ...Array.from(cells, cell => cell.innerText)];
+                    rowData.push(bot);
                     if(dateOfEntry > lastEntry) {
                         tableData.push(rowData);
                         console.log(rowData);
