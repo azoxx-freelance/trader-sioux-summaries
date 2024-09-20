@@ -106,9 +106,13 @@ jqueryScript.onload = function() {
                     } else {
                         $(cells[4]).css("color", "green");
                     }
-
+                    
                     if(cells[1].innerText == 'LIM (Jimsmore)' || cells[1].innerText == 'LIMGEM (Jimsmore)'){
-                        let asset = `${cells[5].innerText.split(" ")[1]}-${cells[6].innerText.split(" ")[1]}`;
+                        let asset = `LIM ${cells[5].innerText.split(" ")[1]}-${cells[6].innerText.split(" ")[1]}`;
+                        cells[1].innerText = asset;
+                    }
+                    if(cells[1].innerText == 'SPT PERP (Jimsmore)'){
+                        let asset = `SPT ${cells[5].innerText.split(" ")[1]}-${cells[6].innerText.split(" ")[1]}`;
                         cells[1].innerText = asset;
                     }
             
