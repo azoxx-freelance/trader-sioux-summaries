@@ -106,8 +106,11 @@ jqueryScript.onload = function() {
                     } else {
                         $(cells[4]).css("color", "green");
                     }
-                    let asset = `${cells[5].innerText.split(" ")[1]}-${cells[6].innerText.split(" ")[1]}`;
-                    cells[1].innerText = asset;
+
+                    if(cells[1].innerText == 'LIM (Jimsmore)' || cells[1].innerText == 'LIMGEM (Jimsmore)'){
+                        let asset = `${cells[5].innerText.split(" ")[1]}-${cells[6].innerText.split(" ")[1]}`;
+                        cells[1].innerText = asset;
+                    }
             
                     let dateOfEntry = convertToDateObject(cells[0].innerText);
                     let rowData = [id, ...Array.from(cells, cell => cell.innerText)];
@@ -613,7 +616,7 @@ function convertToDailyFinancialData(data, currency='USDT') {
         let currentDate = new Date(startDate);
         let allDates = [];
     
-        //endDate.setDate(endDate.getDate() + 1);
+        endDate.setDate(endDate.getDate() + 1);
         while (currentDate <= endDate) {
             allDates.push(new Date(currentDate));
             currentDate.setDate(currentDate.getDate() + 1);
