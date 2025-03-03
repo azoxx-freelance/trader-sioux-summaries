@@ -19,18 +19,10 @@ jqueryScript.onload = function() {
     let bots = {
         'BTC-USDT': [28, 0],
         'ETH-USDT': [29, 0],
-        'XRP-USDT': [30, 0],
-        'SOL-USDT': [61, 0],
-        'BGB-USDT': [62, 0],
-        'ETH-BTC': [64, 0],
-        'PAXG-USDT': [73, 0],
-        'BGB-ETH': [77, 0],
-        'BGB-BTC': [78, 0],
-        'TRX-USDT': [79, 0],
-        'TRX-ETH': [84, 0],
+        'MX-USDT': [30, 0],
+        'MX-ETH': [77, 0],
+        'TRX-BTC': [79, 0],
         
-        'BLAST-USDT': [58, 0],
-        'AR-USDT': [69, 0]
     };
     let ponderation = [6,1,2,4,8,16,36];
     let martingale = [100, 98.82, 97.614, 95.53, 92.72, 88.67, 82.8, 74.29];
